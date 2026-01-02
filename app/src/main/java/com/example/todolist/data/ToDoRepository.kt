@@ -4,13 +4,18 @@ import com.example.todolist.domain.ToDo
 import kotlinx.coroutines.flow.Flow
 
 interface ToDoRepository {
-    suspend fun insert(title: String, description: String?, id: Long? = null)
 
-    suspend fun updateCompleted(id: Long, isChecked: Boolean)
+    suspend fun insert(
+        title: String,
+        description: String?,
+        id: String? = null
+    )
 
-    suspend fun delete(id: Long)
+    suspend fun updateCompleted(id: String, isChecked: Boolean)
+
+    suspend fun delete(id: String)
 
     fun getAll(): Flow<List<ToDo>>
 
-    suspend fun getById(id: Long): ToDo?
+    suspend fun getById(id: String): ToDo?
 }

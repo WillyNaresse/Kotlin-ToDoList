@@ -12,9 +12,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class AddEditViewModel(
-    private val id: Long? = null,
-    private val repository: ToDoRepository,
+    private val id: String?,
+    private val repository: ToDoRepository
 ) : ViewModel() {
+
     var title by mutableStateOf("")
         private set
 
@@ -25,11 +26,13 @@ class AddEditViewModel(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        id?.let {
+        if (id != null) {
             viewModelScope.launch {
-                val todo = repository.getById(it)
-                title = todo?.title ?: ""
-                description = todo?.description
+                val todo = repository.getById(id)
+                todo?.let {
+                    title = it.title
+                    description = it.description
+                }
             }
         }
     }
@@ -53,11 +56,18 @@ class AddEditViewModel(
     private fun saveTodo() {
         viewModelScope.launch {
             if (title.isBlank()) {
-                _uiEvent.send(UiEvent.ShowSnackbar("Adicione um título!"))
+                _uiEvent.send(
+                    UiEvent.ShowSnackbar("O título não pode ser vazio")
+                )
                 return@launch
             }
 
-            repository.insert(title, description, id)
+            repository.insert(
+                title = title,
+                description = description,
+                id = id
+            )
+
             _uiEvent.send(UiEvent.NavigateBack)
         }
     }

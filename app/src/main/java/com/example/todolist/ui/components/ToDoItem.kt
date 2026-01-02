@@ -18,12 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.todolist.domain.ToDo
-import com.example.todolist.domain.todo1
-import com.example.todolist.domain.todo2
-import com.example.todolist.ui.theme.TodoListTheme
 
 @Composable
 fun ToDoItem(
@@ -75,33 +71,5 @@ fun ToDoItem(
                 Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun ToDoItemPreview() {
-    TodoListTheme {
-        ToDoItem(
-            todo = todo1,
-            onCheckedChange = TODO(),
-            onItemClick = TODO(),
-            onDeleteClick = TODO(),
-            modifier = TODO()
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun ToDoItemCompletedPreview() {
-    TodoListTheme {
-        ToDoItem(
-            todo = todo2,
-            onCheckedChange = TODO(),
-            onItemClick = TODO(),
-            onDeleteClick = TODO(),
-            modifier = TODO()
-        )
     }
 }

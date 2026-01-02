@@ -32,7 +32,7 @@ object SignUpRoute
 object RoutesList
 
 @Serializable
-data class AddEditRoute(val id: Long? = null)
+data class AddEditRoute(val id: String? = null)
 
 @Composable
 fun ToDoNavHost() {

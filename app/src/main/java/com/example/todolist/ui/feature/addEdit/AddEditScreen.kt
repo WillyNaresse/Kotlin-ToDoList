@@ -19,23 +19,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.todolist.data.ToDoRepositoryImpl
-import com.example.todolist.data.TodoDatabaseProvider
+import com.example.todolist.data.FirebaseToDoRepositoryImpl
 import com.example.todolist.ui.UiEvent
 import com.example.todolist.ui.theme.TodoListTheme
 
 @Composable
 fun AddEditScreen(
-    id: Long?,
+    id: String?,
     navigateBack: () -> Unit
 ) {
-    val context = LocalContext.current.applicationContext
-    val database = TodoDatabaseProvider.provide(context)
-    val repository = ToDoRepositoryImpl(database.todoDao)
+    val repository = remember {
+        FirebaseToDoRepositoryImpl()
+    }
+
     val viewModel = viewModel<AddEditViewModel> {
         AddEditViewModel(
             id = id,
@@ -54,17 +52,14 @@ fun AddEditScreen(
         viewModel.uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = uiEvent.message,
-                    )
+                    snackbarHostState.showSnackbar(uiEvent.message)
                 }
 
                 UiEvent.NavigateBack -> {
                     navigateBack()
                 }
 
-                is UiEvent.Navigate<*> -> {
-                }
+                else -> {}
             }
         }
     }
@@ -80,30 +75,29 @@ fun AddEditScreen(
 @Composable
 fun AddEditContent(
     title: String,
-    description: String? = null,
+    description: String?,
     snackbarHostState: SnackbarHostState,
-    onEvent: (AddEditEvent) -> Unit = {},
+    onEvent: (AddEditEvent) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                onEvent(AddEditEvent.Save)
-            }) {
-                Icon(Icons.Default.Check, contentDescription = "Save")
+            FloatingActionButton(
+                onClick = { onEvent(AddEditEvent.Save) }
+            ) {
+                Icon(Icons.Default.Check, contentDescription = "Salvar")
             }
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
-                .consumeWindowInsets(it)
+                .consumeWindowInsets(padding)
                 .padding(16.dp)
         ) {
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 value = title,
                 onValueChange = {
                     onEvent(AddEditEvent.TitleChanged(it))
@@ -116,29 +110,15 @@ fun AddEditContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 value = description ?: "",
                 onValueChange = {
                     onEvent(AddEditEvent.DescriptionChanged(it))
                 },
                 placeholder = {
-                    Text(text = "Adicione a descrição (OPCIONAL)")
+                    Text(text = "Adicione a descrição (opcional)")
                 }
             )
         }
-    }
-}
-
-@Preview
-@Composable
-private fun AddEditContentPreview() {
-    TodoListTheme {
-        AddEditContent(
-            title = "Title",
-            description = "Description",
-            snackbarHostState = SnackbarHostState(),
-            onEvent = {}
-        )
     }
 }
